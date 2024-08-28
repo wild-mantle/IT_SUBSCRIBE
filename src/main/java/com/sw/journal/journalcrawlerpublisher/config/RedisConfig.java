@@ -24,10 +24,13 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}") // Redis 서버 포트
     private int port;
 
-    @Bean
+    @Bean // 기존 네이밍 빈이 관문이되서 삭제 불가
     public RedisConnectionFactory redisConnectionFactory() {
+        // 메서드명이 Bean 이름이 됨
         return new LettuceConnectionFactory(
-                new RedisStandaloneConfiguration(host, port)
+                new RedisStandaloneConfiguration(
+                        // 원격 이용 및 Docker 사용을 염두에 두고 full args 생성자 사용
+                        host, port)
         );
     }
 
@@ -40,9 +43,14 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisConf);
     }
 
-    @Bean
+    // ================ Redis 접속객체 생성 완료 ==================
+    // 커맨드 구조를 미리 정의하는 Template 객체를 사용해야 실제 Redis 호출 가능
+
+
+    @Bean // 빈을 없엘 순 없음
     public RedisTemplate<String, String> redisTemplate(
-            RedisConnectionFactory redisConnectionFactory
+            RedisConnectionFactory redisConnectionFactory // 없엘 수 없음
+            // 메서드 시그니처를 반드시 따라야하는 메서드가 많음
     ) {
         return new StringRedisTemplate(redisConnectionFactory);
     }
